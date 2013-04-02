@@ -26,6 +26,12 @@ describe "and_call_original" do
       expect(instance.meth_1).to eq(:original)
     end
 
+    it 'ignores prior declared stubs' do
+      instance.stub(:meth_1).and_return(:stubbed_value)
+      instance.should_receive(:meth_1).and_call_original
+      expect(instance.meth_1).to eq(:original)
+    end
+
     it 'passes args and blocks through to the original method' do
       instance.should_receive(:meth_2).and_call_original
       value = instance.meth_2(:submitted_arg) { |a, b| [a, b] }
