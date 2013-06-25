@@ -20,7 +20,7 @@ module RSpec
 
       def find_original_method
         method_handle_name = if any_instance_class_recorder_observing_method?(@object.class)
-          @object.class.__recorder.build_alias_method_name(@method_name)
+          ::RSpec::Mocks.any_instance_recorder_for(@object.class).build_alias_method_name(@method_name)
         else
           @method_name
         end
