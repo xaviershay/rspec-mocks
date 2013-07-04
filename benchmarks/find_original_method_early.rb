@@ -23,24 +23,73 @@ Foo = Class.new(Object) do
   end
 end
 
-Benchmark.bmbm do |bm|
-  puts "#{n} times - ruby #{RUBY_VERSION}"
+puts "#{n} times - ruby #{RUBY_VERSION}"
 
-  perform_report = lambda do |label, find_original, &create_object|
-    bm.report(label) do
-      dbl = create_object.call
-      $find_original = find_original
+perform_report = lambda do |bm, label, find_original, &create_object|
+  bm.report(label) do
+    dbl = create_object.call
+    $find_original = find_original
 
-      n.times do |i|
-        dbl.stub("meth_#{i}")
-      end
+    n.times do |i|
+      dbl.stub("meth_#{i}")
     end
   end
+end
 
-  perform_report.call("Don't find original - partial mock", false) { Foo.new }
-  perform_report.call("Don't find original - test double", false) { double }
-  perform_report.call("Find original - partial mock", true) { Foo.new }
-  perform_report.call("Find original - test double", true) { double }
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
+  perform_report.call(bm, "Find original - test double",         true) { double }
+end
+
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
+  perform_report.call(bm, "Find original - test double",         true) { double }
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
+end
+
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
+  perform_report.call(bm, "Find original - test double",         true) { double }
+end
+
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+  perform_report.call(bm, "Find original - test double",         true) { double }
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
+end
+
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
+  perform_report.call(bm, "Find original - test double",         true) { double }
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+end
+
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Find original - test double",         true) { double }
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+end
+
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
+  perform_report.call(bm, "Find original - test double",         true) { double }
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
+end
+
+Benchmark.bmbm do |bm|
+  perform_report.call(bm, "Find original - test double",         true) { double }
+  perform_report.call(bm, "Find original - partial mock",        true  { Foo.new }
+  perform_report.call(bm, "Don't find original - test double",  false) { double }
+  perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
 end
 
 =begin
