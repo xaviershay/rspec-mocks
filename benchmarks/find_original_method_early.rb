@@ -33,6 +33,7 @@ perform_report = lambda do |bm, label, find_original, &create_object|
     n.times do |i|
       dbl.stub("meth_#{i}")
     end
+    RSpec::Mocks::space.reset_all
   end
 end
 
