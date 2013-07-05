@@ -87,7 +87,7 @@ end
 
 Benchmark.bmbm do |bm|
   perform_report.call(bm, "Find original - test double",         true) { double }
-  perform_report.call(bm, "Find original - partial mock",        true  { Foo.new }
+  perform_report.call(bm, "Find original - partial mock",        true) { Foo.new }
   perform_report.call(bm, "Don't find original - test double",  false) { double }
   perform_report.call(bm, "Don't find original - partial mock", false) { Foo.new }
 end
