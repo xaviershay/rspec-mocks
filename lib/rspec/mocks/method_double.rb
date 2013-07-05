@@ -3,7 +3,7 @@ module RSpec
     # @private
     class MethodDouble < Hash
       # @private
-      attr_reader :method_name, :object, :original_method
+      attr_reader :method_name, :object
 
       # @private
       def initialize(object, method_name, proxy)
@@ -13,21 +13,13 @@ module RSpec
 
         @method_stasher = InstanceMethodStasher.new(object_singleton_class, @method_name)
         @method_is_proxied = false
-        @original_method = find_original_method
+        @original_method = proxy.method_handle_for(method_name)
         store(:expectations, [])
         store(:stubs, [])
       end
 
-      def find_original_method
-        method_handle_name = if any_instance_class_recorder_observing_method?(@object.class)
-          ::RSpec::Mocks.any_instance_recorder_for(@object.class).build_alias_method_name(@method_name)
-        else
-          @method_name
-        end
-
-        ::RSpec::Mocks.method_handle_for(@object, method_handle_name)
-      rescue NameError
-        Proc.new do |*args, &block|
+      def original_method
+        @original_method ||= Proc.new do |*args, &block|
           @object.__send__(:method_missing, @method_name, *args, &block)
         end
       end
@@ -53,13 +45,6 @@ module RSpec
         else
           'public'
         end
-      end
-
-      def any_instance_class_recorder_observing_method?(klass)
-        return true if ::RSpec::Mocks.any_instance_recorder_for(klass).already_observing?(@method_name)
-        superklass = klass.superclass
-        return false if superklass.nil?
-        any_instance_class_recorder_observing_method?(superklass)
       end
 
       # @private
